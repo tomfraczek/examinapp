@@ -27,11 +27,11 @@ export const SignInForm = () => {
   console.log(watch('email')); // watch input value by passing the name of it
 
   return (
-    <SignInFormContainer>
+    <div className='border border-gray-800 bg-gray-900 w-96 mt-4 rounded-lg p-5 flex flex-col'>
       <Header>Enter email and password</Header>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Input
-          className='mb-3'
+          className='mb-6'
           type='email'
           placeholder='you@example.com'
           labelPlacement='outside'
@@ -55,10 +55,10 @@ export const SignInForm = () => {
         {/* errors will return when field validation fails  */}
         {errors.exampleRequired && <span>This field is required</span>}
 
-        <CtaContainer>
+        <div className='w-full flex justify-end mt-6'>
           <Button type='submit'>Submit</Button>
-        </CtaContainer>
+        </div>
       </form>
-    </SignInFormContainer>
+    </div>
   );
 };

@@ -3,7 +3,7 @@ import { lightBlack } from '@/app/theme/color';
 import styled from 'styled-components';
 
 export const SignInFormContainer = styled.div`
-  width: 400px;
+  width: 384px;
   padding: 20px;
   border: ${regular};
   border-radius: ${regularRadius};
