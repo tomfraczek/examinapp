@@ -1,7 +1,7 @@
 'use client';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { Header, SignInFormContainer } from './signInForm.styles';
-import TextField from '@mui/material/TextField';
+import { Input } from '@nextui-org/react';
 
 type Inputs = {
   example: string;
@@ -20,21 +20,9 @@ export const SignInForm = () => {
   console.log(watch('example')); // watch input value by passing the name of it
 
   return (
-    <SignInFormContainer>
-      <Header>Login to explore</Header>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        {/* register your input into the hook by invoking the "register" function */}
-        <input defaultValue='test' {...register('example')} />
-        <TextField id='outlined-basic' label='Outlined' variant='outlined' />
-        <TextField id='filled-basic' label='Filled' variant='filled' />
-        <TextField id='standard-basic' label='Standard' variant='standard' />
-        {/* include validation with required or other standard HTML validation rules */}
-        <input {...register('exampleRequired', { required: true })} />
-        {/* errors will return when field validation fails  */}
-        {errors.exampleRequired && <span>This field is required</span>}
-
-        <input type='submit' />
-      </form>
-    </SignInFormContainer>
+    <div className='flex w-full flex-wrap md:flex-nowrap gap-4'>
+      <Input type='email' label='Email' />
+      <Input type='email' label='Email' placeholder='Enter your email' />
+    </div>
   );
 };
