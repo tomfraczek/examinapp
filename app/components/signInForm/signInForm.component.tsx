@@ -13,7 +13,8 @@ import Logo from '@/public/images/logoTrans.png';
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import Link from 'next/link';
 
-import { auth, googleAuthProvider } from '@/app/lib/firebase/firebase';
+import { auth, googleAuthProvider, db } from '@/app/lib/firebase/firebase';
+import { collection, addDoc, getDocs, query, where } from 'firebase/firestore';
 
 type Inputs = {
   email: string;
@@ -31,16 +32,42 @@ export const SignInForm = () => {
   } = useForm<Inputs>();
   const onSubmit: SubmitHandler<Inputs> = (data) => console.log(data);
 
-  console.log(watch('email')); // watch input value by passing the name of it
+  // console.log(watch('email')); // watch input value by passing the name of it
+
+  // const addToDB = async ({ displayName, email, uid }) => {};
+  const getUserByEmail = async (email: string | null) => {
+    const querySnapshot = await getDocs(query(collection(db, 'users'), where('email', '==', email)));
+    return !querySnapshot.empty;
+  };
 
   const handleGoogleLogin = () => {
     signInWithPopup(auth, googleAuthProvider)
-      .then((result) => {
+      .then(async (result) => {
         // This gives you a Google Access Token. You can use it to access the Google API.
         const credential = GoogleAuthProvider.credentialFromResult(result);
         // const token = credential.accessToken;
         // The signed-in user info.
-        // const user = result.user;
+        const user = result.user;
+        const { displayName, email, uid } = user as {
+          displayName: string | null;
+          email: string | null;
+          uid: string | null;
+        };
+
+        const userExists = await getUserByEmail(email);
+
+        if (!userExists)
+          try {
+            const docRef = await addDoc(collection(db, 'users'), {
+              displayName,
+              email,
+              uid,
+            });
+            console.log('Document written with ID: ', docRef.id);
+          } catch (e) {
+            console.error('Error adding document: ', e);
+          }
+
         // IdP data available using getAdditionalUserInfo(result)
         // ...
       })
@@ -63,11 +90,8 @@ export const SignInForm = () => {
         <p className='text-3xl text-white'>Sign in to ExaminApp</p>
       </div>
       <div className='border border-gray-800 bg-gray-900 w-96 mt-4 rounded-lg p-5 flex flex-col'>
-        <Button className='w-full mb-4' onClick={() => signIn('google')} type='submit'>
-          Sign in with google
-        </Button>
         <Button onClick={handleGoogleLogin} className='w-full' type='submit'>
-          Sign in with firebase google
+          Sign in with google
         </Button>
       </div>
       <p className='mt-6 mb-4'>or</p>
