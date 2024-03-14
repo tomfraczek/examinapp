@@ -10,7 +10,10 @@ import { Button } from '@nextui-org/react';
 import { signIn } from 'next-auth/react';
 import Image from 'next/image';
 import Logo from '@/public/images/logoTrans.png';
+import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import Link from 'next/link';
+
+import { auth, googleAuthProvider } from '@/app/lib/firebase/firebase';
 
 type Inputs = {
   email: string;
@@ -30,12 +33,44 @@ export const SignInForm = () => {
 
   console.log(watch('email')); // watch input value by passing the name of it
 
+  const handleGoogleLogin = () => {
+    signInWithPopup(auth, googleAuthProvider)
+      .then((result) => {
+        // This gives you a Google Access Token. You can use it to access the Google API.
+        const credential = GoogleAuthProvider.credentialFromResult(result);
+        // const token = credential.accessToken;
+        // The signed-in user info.
+        // const user = result.user;
+        // IdP data available using getAdditionalUserInfo(result)
+        // ...
+      })
+      .catch((error) => {
+        // Handle Errors here.
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        // The email of the user's account used.
+        const email = error.customData.email;
+        // The AuthCredential type that was used.
+        const credential = GoogleAuthProvider.credentialFromError(error);
+        // ...
+      });
+  };
+
   return (
     <>
       <div className='flex-initial mb-10 flex flex-col items-center'>
         <Image className='mb-4' src={Logo} width={100} height={100} alt='Logo' />
         <p className='text-3xl text-white'>Sign in to ExaminApp</p>
       </div>
+      <div className='border border-gray-800 bg-gray-900 w-96 mt-4 rounded-lg p-5 flex flex-col'>
+        <Button className='w-full mb-4' onClick={() => signIn('google')} type='submit'>
+          Sign in with google
+        </Button>
+        <Button onClick={handleGoogleLogin} className='w-full' type='submit'>
+          Sign in with firebase google
+        </Button>
+      </div>
+      <p className='mt-6 mb-4'>or</p>
       <div className='border border-gray-800 bg-gray-900 w-96 mt-4 rounded-lg p-5 flex flex-col'>
         <Header>Enter email and password</Header>
         <form onSubmit={handleSubmit(onSubmit)}>
@@ -67,9 +102,6 @@ export const SignInForm = () => {
             <Button type='submit'>Submit</Button>
           </div>
         </form>
-        <Button onClick={() => signIn('google')} type='submit'>
-          Sign in with google
-        </Button>
       </div>
       <div className='border border-gray-800 w-96 mt-4 rounded-lg p-5 flex'>
         <p className='mr-2'>New to Examinap?</p> <Link href='/signUp'>Create an account</Link>
