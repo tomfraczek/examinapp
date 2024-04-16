@@ -1,20 +1,30 @@
-'use client';
-import { useState } from 'react';
-import { useForm, SubmitHandler } from 'react-hook-form';
-import { Header } from './signInForm.styles';
-import { Input } from '@nextui-org/react';
-import { EyeFilledIcon } from './EyeFilledIcon';
-import { EyeSlashFilledIcon } from './EyeSlashFilledIcon';
-import { MailIcon } from './MailIcon';
-import { Button } from '@nextui-org/react';
-import { signIn } from 'next-auth/react';
-import Image from 'next/image';
-import Logo from '@/public/images/logoTrans.png';
-import { GoogleAuthProvider, signInWithPopup, createUserWithEmailAndPassword } from 'firebase/auth';
-import Link from 'next/link';
+"use client";
+import { useState } from "react";
+import { useForm, SubmitHandler } from "react-hook-form";
+import {
+  CtaContainer,
+  Header,
+  LogoContainer,
+  RegisterContainer,
+  SignInWithEmailContainer,
+  TextWhite,
+} from "./signInForm.styles";
+import { Input } from "@nextui-org/react";
+import { EyeFilledIcon } from "./EyeFilledIcon";
+import { EyeSlashFilledIcon } from "./EyeSlashFilledIcon";
+import { MailIcon } from "./MailIcon";
+import { Button } from "@nextui-org/react";
+import Image from "next/image";
+import Logo from "@/public/images/logoTrans.png";
+import {
+  GoogleAuthProvider,
+  signInWithPopup,
+  createUserWithEmailAndPassword,
+} from "firebase/auth";
+import Link from "next/link";
 
-import { auth, googleAuthProvider, db } from '@/app/lib/firebase/firebase';
-import { collection, addDoc, getDocs, query, where } from 'firebase/firestore';
+import { auth, googleAuthProvider, db } from "@/app/lib/firebase/firebase";
+import { collection, addDoc, getDocs, query, where } from "firebase/firestore";
 
 type Inputs = {
   email: string;
@@ -49,7 +59,9 @@ export const SignInForm = () => {
 
   // const addToDB = async ({ displayName, email, uid }) => {};
   const getUserByEmail = async (email: string | null) => {
-    const querySnapshot = await getDocs(query(collection(db, 'users'), where('email', '==', email)));
+    const querySnapshot = await getDocs(
+      query(collection(db, "users"), where("email", "==", email))
+    );
     return !querySnapshot.empty;
   };
 
@@ -71,14 +83,14 @@ export const SignInForm = () => {
 
         if (!userExists)
           try {
-            const docRef = await addDoc(collection(db, 'users'), {
+            const docRef = await addDoc(collection(db, "users"), {
               displayName,
               email,
               uid,
             });
-            console.log('Document written with ID: ', docRef.id);
+            console.log("Document written with ID: ", docRef.id);
           } catch (e) {
-            console.error('Error adding document: ', e);
+            console.error("Error adding document: ", e);
           }
 
         // IdP data available using getAdditionalUserInfo(result)
@@ -98,52 +110,69 @@ export const SignInForm = () => {
 
   return (
     <>
-      <div className='flex-initial mb-10 flex flex-col items-center'>
-        <Image className='mb-4' src={Logo} width={100} height={100} alt='Logo' />
-        <p className='text-3xl text-white'>Sign in to ExaminApp</p>
-      </div>
-      <div className='border border-gray-800 bg-gray-900 w-96 mt-4 rounded-lg p-5 flex flex-col'>
-        <Button onClick={handleGoogleSignIn} className='w-full mb-4' type='submit'>
+      <LogoContainer>
+        <Image
+          className="mb-4"
+          src={Logo}
+          width={100}
+          height={100}
+          alt="Logo"
+        />
+        <p className="text-3xl text-white">Sign in to ExaminApp</p>
+      </LogoContainer>
+      <CtaContainer>
+        <Button
+          onClick={handleGoogleSignIn}
+          className="w-full mb-4"
+          type="submit"
+        >
           Sign in with google
         </Button>
-      </div>
-      <p className='mt-6 mb-4'>or</p>
-      <div className='border border-gray-800 bg-gray-900 w-96 mt-4 rounded-lg p-5 flex flex-col'>
+      </CtaContainer>
+      {/* <TextWhite>or</TextWhite> */}
+      <SignInWithEmailContainer>
         <Header>Enter email and password</Header>
         <form onSubmit={handleSubmit(onSubmit)}>
           <Input
-            className='mb-6'
-            type='email'
-            placeholder='you@example.com'
-            labelPlacement='outside'
-            startContent={<MailIcon className='text-2xl text-default-400 pointer-events-none flex-shrink-0' />}
-            {...register('email')}
+            className="mb-6"
+            type="email"
+            placeholder="you@example.com"
+            labelPlacement="outside"
+            startContent={
+              <MailIcon className="text-2xl text-default-400 pointer-events-none flex-shrink-0" />
+            }
+            {...register("email")}
           />
           <Input
-            placeholder='Enter your password'
-            labelPlacement='outside'
-            {...register('password')}
+            placeholder="Enter your password"
+            labelPlacement="outside"
+            {...register("password")}
             endContent={
-              <button className='focus:outline-none' type='button' onClick={() => setShowPassword(!showPassword)}>
+              <button
+                className="focus:outline-none"
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+              >
                 {showPassword ? (
-                  <EyeSlashFilledIcon className='text-2xl text-default-400 pointer-events-none' />
+                  <EyeSlashFilledIcon className="text-2xl text-default-400 pointer-events-none" />
                 ) : (
-                  <EyeFilledIcon className='text-2xl text-default-400 pointer-events-none' />
+                  <EyeFilledIcon className="text-2xl text-default-400 pointer-events-none" />
                 )}
               </button>
             }
-            type={showPassword ? 'text' : 'password'}
+            type={showPassword ? "text" : "password"}
           />
           {errors.exampleRequired && <span>This field is required</span>}
 
-          <div className='w-full flex justify-end mt-6'>
-            <Button type='submit'>Submit</Button>
+          <div className="w-full flex justify-end mt-6">
+            <Button type="submit">Submit</Button>
           </div>
         </form>
-      </div>
-      <div className='border border-gray-800 w-96 mt-4 rounded-lg p-5 flex'>
-        <p className='mr-2'>New to Examinap?</p> <Link href='/signUp'>Create an account</Link>
-      </div>
+      </SignInWithEmailContainer>
+      <RegisterContainer>
+        <TextWhite>Register with Email and Password</TextWhite>
+        <Link href="/signUp">Create an account</Link>
+      </RegisterContainer>
     </>
   );
 };
