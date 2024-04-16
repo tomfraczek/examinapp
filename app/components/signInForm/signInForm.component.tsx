@@ -24,7 +24,8 @@ import {
 import Link from "next/link";
 
 import { auth, googleAuthProvider, db } from "@/app/lib/firebase/firebase";
-import { collection, addDoc, getDocs, query, where } from "firebase/firestore";
+import { collection, addDoc } from "firebase/firestore";
+import { getUserByEmail } from "@/app/lib/firebase/helpers";
 
 type Inputs = {
   email: string;
@@ -55,15 +56,7 @@ export const SignInForm = () => {
       });
   };
 
-  // console.log(watch('email')); // watch input value by passing the name of it
-
   // const addToDB = async ({ displayName, email, uid }) => {};
-  const getUserByEmail = async (email: string | null) => {
-    const querySnapshot = await getDocs(
-      query(collection(db, "users"), where("email", "==", email))
-    );
-    return !querySnapshot.empty;
-  };
 
   const handleGoogleSignIn = () => {
     signInWithPopup(auth, googleAuthProvider)

@@ -12,9 +12,14 @@ import { Main } from "./page.styles";
 export default function Home() {
   const [user, setUser] = useState<User | null>(null);
   useEffect(() => {
-    onAuthStateChanged(auth, async (user) => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
       setUser(user);
     });
+    return () => unsubscribe();
   }, []);
-  return <Main>{user ? <Dashboard /> : <SignInForm />}</Main>;
+
+  // useEffect(() => {
+  //   console.log(user);
+  // }, [user]);
+  return <Main>{user ? <Dashboard userId={user.uid} /> : <SignInForm />}</Main>;
 }
